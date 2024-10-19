@@ -1,6 +1,5 @@
 # include <iostream>
 # include <vector>
-# include <queue>
 
 using namespace std;
 
@@ -143,27 +142,4 @@ public:
         heapifyUp(data.size() - 1);
     } 
 
-    vector<int> sort() {
-        vector<int> temp(data.size());
-
-        for(int i = data.size() -1; i >= 0; i--) {
-            temp[i] = getMax();
-            removeMax();
-        }
-        return temp;
-    }
-
 };
-
-
-int main() {
-    MaxHeap h({5, 3, 69, 420, 4, 8, 7, 4});
-
-    vector<int> t = h.sort();
-
-    for(int i: t) {
-        cout << i << ' ';
-    }
-
-    return 0;
-}
