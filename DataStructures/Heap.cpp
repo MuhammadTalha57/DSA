@@ -4,14 +4,14 @@
 
 using namespace std;
 
-class Heap {
+class MaxHeap {
 private:
     vector<int> data; 
 public:
 
-    Heap(vector<int> arr) {
+    MaxHeap(vector<int> arr) {
         data = arr;
-        heapify();
+        heapifyBuild( (data.size() / 2) - 1 );
     }
 
     int getParent(int i) {
@@ -52,81 +52,63 @@ public:
         }
     }
 
-    void heapify(int k = -1){
-        // k = 0 (Delete)   k = 1 (Insert)   else (constructing)
+    void heapifyUp(int child) {
+        // For insertion, child = data.size() - 1
+
         if(data.size() == 0) {
             cout << "Heap empty\n\n";
             return;
         }
 
-        if(k == 1) {
-            k = data.size() - 1;
-            int i = getParent(k);
-            while(i != -1 && data[k] > data[i]) {
-                swap(data[i], data[k]);
-                k = i;
-                i = getParent(k);
-            }
-        }
+        int parent = getParent(child);
 
-        else {
-
-            if(k == -1) {
-                k = data.size()- 1;
-            }
-
-            queue<int> q;
-            q.push(k);
-
-            while(!q.empty()) {
-                int i = q.front();
-                q.pop();
-
-                int l = getLeftChild(i);
-                int r = getRightChild(i);
-                int max = i;
-
-                if(l != -1) {
-                    if(data[l] > data[max]) {max = l;}
-                }
-                
-                if(r != -1) {
-                    if(data[r] > data[max]) {max = r;}
-                }
-
-                if(max != i) {
-                    swap(data[i], data[max]);
-                    q.push(max);
-                    continue;
-                }
-
-                if(k != 0) {q.push(--k);}
-            }
-
+        while(parent != -1 && data[child] > data[parent]) {
+            swap(data[parent], data[child]);
+            child = parent;
+            parent = getParent(child);
         }
     }
 
-    void BFS() {
-        if(data.size() != 0) {
-            queue<int> q;
-            q.push(0);
-
-            while(!q.empty()) {
-                int i = q.front();
-                q.pop();
-
-                cout << data[i] << ' ';
-
-                int l = getLeftChild(i);
-                int r = getRightChild(i);
-
-                if(l != -1) {q.push(l);}
-
-                if(r != -1) {q.push(r);}
-            }
-            cout << endl << endl;
-
+    void heapifyDown(int parent) {
+        if(data.size() == 0) {
+            cout << "Heap empty\n\n";
+            return;
         }
+
+        int l = getLeftChild(parent);
+        int r = getRightChild(parent);
+        int max = parent;
+
+        if(l != -1) {
+            if(data[l] > data[max]) {max = l;}
+        }
+        
+        if(r != -1) {
+            if(data[r] > data[max]) {max = r;}
+        }
+
+        if(max != parent) {
+            swap(data[parent], data[max]);
+
+            // After swapping parent is at max index now
+            heapifyDown(max);
+        }
+    }
+
+    void heapifyBuild(int parent) {
+        // When calling, parent should be ( data.size() / 2 ) - 1
+        // This ensures that building starts from non-leaf nodes
+
+        if(data.size() == 0) {
+            cout << "Heap empty\n\n";
+            return;
+        }
+
+        while(parent >= 0) {
+            heapifyDown(parent--);
+        }
+        
+
     }
 
     int getMax() {
@@ -152,9 +134,14 @@ public:
             data.pop_back();
 
             data[0] = temp;
-            heapify(0);
+            heapifyDown(0);
         }
     }
+
+    void insert(int e) {
+        data.push_back(e);
+        heapifyUp(data.size() - 1);
+    } 
 
     vector<int> sort() {
         vector<int> temp(data.size());
@@ -166,16 +153,11 @@ public:
         return temp;
     }
 
-    void insert(int e) {
-        data.push_back(e);
-        heapify(1);
-    } 
-
 };
 
 
 int main() {
-    Heap h({5, 3, 69, 420, 4, 8, 7, 4});
+    MaxHeap h({5, 3, 69, 420, 4, 8, 7, 4});
 
     vector<int> t = h.sort();
 
