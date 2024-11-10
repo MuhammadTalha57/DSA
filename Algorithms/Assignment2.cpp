@@ -71,7 +71,7 @@ void selectionSort(Node* head) {
 
 }
 
-// Insertion sort cannot be applied
+// Insertion sort working with MODIFICATION
 void insertionSort(Node* head) {
     int n = 0, x;
 
