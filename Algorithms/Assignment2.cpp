@@ -103,10 +103,100 @@ void insertionSort(Node*& head) {
 }
 
 
+Node* partition(Node* head, Node* tail) {
+    Node* pivot = head;
+
+    Node* j = head;
+    Node* curr = head;
+
+    while(curr != tail->next) {
+        if(curr->data < pivot->data) {
+            swap(curr->data, j->next->data);
+            j = j->next;
+        }
+        curr = curr->next;
+    } 
+
+    swap(pivot->data, j->data);
+    return j;
+}
+
+void quickSortHelper(Node* head, Node* tail) {
+    if(head == nullptr || head == tail) {return;}
+
+    Node* j = partition(head, tail);
+    quickSortHelper(head, j);
+    quickSortHelper(j->next, tail);
+}
+
+void quickSort(Node* head) {
+    if(head == nullptr) {return;}
+
+    Node* tail = head;
+    while(tail->next != nullptr) {
+        tail = tail->next;
+    }
+
+    quickSortHelper(head, tail);
+
+}
+
+Node* merge(Node* first, Node* second) {
+    if(first == nullptr) {
+        return second;
+    }
+    else if(second == nullptr) {
+        return first;
+    }
+
+    if(first->data < second->data) {
+        first->next = merge(first->next, second);
+        return first;
+    }
+    else {
+        second->next = merge(first, second->next);
+        return second;
+    }
+}
+
+Node* split(Node* head) {
+
+
+    Node* fast = head;
+    Node* slow = head;
+
+    while(fast != nullptr && fast->next != nullptr) {
+        fast = fast->next->next;
+        if(fast != nullptr) {
+            slow = slow->next;
+        }
+    }
+
+    Node* temp = slow->next;
+    slow->next = nullptr;
+    return temp;
+
+}
+
+Node* mergeSort(Node*& head) {
+    if(head == nullptr || head->next == nullptr) {
+        return head;
+    }
+
+    Node* second = split(head);
+
+    head = mergeSort(head);
+    second = mergeSort(second);
+
+    head =  merge(head, second);
+    return head;
+
+}
 
 int main() {
 
     vector<int> v = {32,8,1,54,23,98,3,7,43,71,29,1};
+    //vector<int> v = {10,9,8,7,6,5,4,3,2,1};
     Node* head = nullptr;
     Node* tempNode = nullptr;
     Node* newNode = nullptr;
@@ -122,7 +212,7 @@ int main() {
         }
     }
 
-    insertionSort(head);
+    mergeSort(head);
 
     tempNode = head;
     while(tempNode != nullptr) {
