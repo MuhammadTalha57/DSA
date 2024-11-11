@@ -71,66 +71,42 @@ void selectionSort(Node* head) {
 
 }
 
-// Insertion sort working with MODIFICATION
-void insertionSort(Node* head) {
-    int n = 0, x;
+// Insertion Sort working
+void insertionSort(Node*& head) {
+    Node* current = head->next;
+    Node* sorted = head;
+    sorted->next = nullptr;
 
-    Node* iNode = head->next;
-    Node* jNode = new Node(head->data);
-    Node* temp = nullptr;
-
-    Node* j1Node = nullptr;
-    if(head->next != nullptr) {
-        j1Node =new Node(head->next->data);
-        j1Node->next = new Node(head->data);
-    }
-
-    Node* tempJNode = nullptr;
-    Node* tempJ1Node = nullptr;
-
-
-    while(true) {
-
-        temp = iNode;
-
-        tempJNode = j1Node->next;
-        tempJ1Node = j1Node;
+    while(current!= nullptr) {
         
-        while(tempJNode != nullptr && tempJNode->data < temp->data) {
-            tempJ1Node->data = tempJNode->data;
-            tempJ1Node = tempJ1Node->next;
-            tempJNode = tempJNode->next;
+        Node* next = current->next;
+
+        if(current->data < sorted->data) {
+            current->next = sorted;
+            sorted = current;
+        }
+        else {
+            Node* temp = sorted;
+            while(temp->next != nullptr && temp->next->data <= current->data) {
+                temp = temp->next;
+            }
+
+            current->next = temp->next;
+            temp->next = current;
         }
 
-        tempJ1Node->data = temp->data;
-
-
-        if(iNode->next == nullptr) {break;}
-
-
-
-        iNode = iNode->next;
-
-        temp = j1Node;
-        j1Node = new Node(iNode->data);
-        j1Node->next = temp;
-
-        
+        current = next;
     }
 
-    temp = head;
-    tempJ1Node = j1Node;
-
-    while(temp != nullptr) {
-        temp->data = j1Node->data;
-        temp = temp->next;
-        j1Node = j1Node->next;
-    }
+    head = sorted;
+    
 }
+
+
 
 int main() {
 
-    vector<int> v = {5, 1,2,7,6,21,89,1,3,43,12,32,4,8};
+    vector<int> v = {32,8,1,54,23,98,3,7,43,71,29,1};
     Node* head = nullptr;
     Node* tempNode = nullptr;
     Node* newNode = nullptr;
