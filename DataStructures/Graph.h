@@ -18,7 +18,7 @@ private:
 
     std::unordered_map<T, std::vector<std::pair<T, int>>> adjList;
 
-    void DFS(T s, std::unordered_set<T>& visited);
+    void DFS(T s, std::unordered_set<T>& visited, bool print = true);
 
 public:
     Graph(bool d = false, bool w = false);
@@ -31,6 +31,8 @@ public:
 
     void DFS(T s);
 
+    ///DFS(T s, std::unordered_set<T>& visited, bool print = true);
+
     void DFSComplete();
 
     void BFS(T s);
@@ -39,7 +41,84 @@ public:
 
     void BFS(T s, std::unordered_set<T>& visited);
 
+    /*
+    Weighted Graph
+    No Negative Weight
+    Calculates the shortest to all Vertices from source.
+    */
+    void dijkstra(T s);
+
+    int connectedComponents();
+
 };
+
+// For Priority Queue
+template <typename T> class Compare {
+public:
+    bool operator() (std::pair<T, int> p1, std::pair<T, int> p2);
+
+};
+
+template <typename T>
+bool Compare<T>::operator() (std::pair<T, int> p1, std::pair<T, int> p2) {
+    return p1.second > p2.second;
+}
+
+
+
+
+template <typename T>
+int Graph<T>::connectedComponents() {
+    int count = 0;
+
+    std::unordered_set<T> visited;
+    for(auto [k, v]: adjList) {
+        if(visited.find(k) == visited.end()) {
+            count++;
+            DFS(k, visited, false);
+        }
+    }
+
+    return count;
+}
+
+template <typename T>
+void Graph<T>::dijkstra(T s) {
+    if(!weighted) {
+        std::cout << "Dijkstra not applicable on unweighted graph.\n";
+        return;
+    }
+
+        std::unordered_map<T, int> dist;
+        for(auto [k, v]: adjList) {dist[k] = INT_MAX;}
+
+        std::priority_queue<std::pair<T, int>, std::vector<std::pair<T, int>>, Compare<T> > pq;
+        dist[s] = 0;
+        pq.push( std::make_pair(s, 0) );
+
+        T u, v;
+        int w, d;
+        while(!pq.empty()) {
+            u = pq.top().first;
+            d = pq.top().second;
+            pq.pop();
+
+            for(std::pair<T, int> p: adjList[u]) {
+                v = p.first;
+                w = p.second;
+                if( dist[v] > d + w ) {
+                    dist[v] = d + w;
+                    pq.push( std::make_pair(v, dist[v]) );
+                }
+            }
+
+        }
+
+        std::cout << "Shortest Path\n";
+        for(auto [k, v]: dist) {
+            std::cout << k << ": " << v << '\n';
+        }
+}
 
 template <typename T>
 Graph<T>::Graph(bool d, bool w) {directed = d; weighted = w;}
@@ -77,13 +156,14 @@ void Graph<T>::DFS(T s) {
 }
 
 template <typename T>
-void Graph<T>::DFS(T s, std::unordered_set<T>& visited) {
+void Graph<T>::DFS(T s, std::unordered_set<T>& visited, bool print) {
     visited.insert(s);
-    std::cout << s << ' ';
+    if(print) {std::cout << s << ' ';}
+    
 
     for(std::pair<T, int> p: adjList[s]) {
         if(visited.find(p.first) == visited.end()) {
-            DFS(p.first, visited);
+            DFS(p.first, visited, print);
         }
     }
 
@@ -130,6 +210,7 @@ template <typename T>
 void Graph<T>::BFS(T s, std::unordered_set<T>& visited) {
     std::queue<T> q;
     q.push(s);
+    visited.insert(s);
     while(!q.empty()) {
         T curr = q.front();
         q.pop();
@@ -137,7 +218,7 @@ void Graph<T>::BFS(T s, std::unordered_set<T>& visited) {
         std::cout << curr << ' ';
 
         for(std::pair<T, int> p: adjList[curr]) {
-            if(visited.find(p.first) == visited.end()) {q.push(p.first);}
+            if(visited.find(p.first) == visited.end()) {q.push(p.first); visited.insert(p.first);}
         }
 
     }
@@ -149,11 +230,10 @@ void Graph<T>::BFSComplete() {
     //queue<T> q;
 
     for(auto [u, V]: adjList) {
-        for(std::pair<T, int> p: V) {
-            if(visited.find(p.first) == visited.end()) {BFS(p.first, visited);}
-        }
-        
+        if(visited.find(u) == visited.end()) {BFS(u, visited);}
+
     }
+
     std::cout << '\n';
 
 } 
